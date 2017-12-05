@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+    <script type="text/javascript">
+        // top scrolling
+        window.onscroll = function() {scrollFunction()};
+        
+        function scrollFunction() {
+            if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+                document.getElementById("myBtn").style.display = "block";
+            } else {
+                document.getElementById("myBtn").style.display = "none";
+            }
+        }
+        
+        // When the user clicks on the button, scroll to the top of the document
+        function topFunction() {
+            document.body.scrollTop = 0;
+            document.documentElement.scrollTop = 0;
+        }
+
+        // local-logic 
+        $(document).ready(function () {
+            var nearby = "";
+            var around = "";
+
+            // loading local-logic widget
+            var s = document.createElement("script");
+            s.setAttribute("src", "https://cdn.locallogic.co/widget-v3/assets/js/latest.js");
+            s.setAttribute("type", "text/javascript");
+            s.onload = function () {
+                var w = new locallogic.Widget("local-logic-widget", {
+                lat: "49.2757",
+                lng: "-123.1199",
+                color: "#017f8f",
+                locale: "en",
+                token: "85783e4fbc973b96643868f0333ccbd498d71a0a4b7ca3286537c4e3b97cf5fc391e59eb0992495a"
+                });    
+            }
+            document.getElementsByTagName("head")[0].appendChild(s);  
+            
+            // local-logic api calls
+            $.ajaxSetup({
+                headers : {
+                    'X-API-KEY': 'PB3tK4ljMM9qfVSTxRL1k3GlkuHZJPIM4bFuP71a'
+                }
+            });
+            $('#location-scores').click(function () {
+                var lat = $('#lat').val();
+                var lng = $('#lng').val();
+                $('#error').hide()
+
+                if (lat == '' || lng == '') {
+                    $('#error').show()
+                    return;
+                }
+
+                $.getJSON('https://api.locallogic.co/v1/scores', 
+                {
+                    lat: lat,
+                    lng: lng,
+                    include: "transit_friendly,quiet",
+                    fields: "value,text,description,category,name",
+                    locale: "en"
+                }, function (data) {
+                    console.log(data)
+                    nearby = data.data.links.nearby;
+                    around = data.data.links.around;
+                    console.log(around)
+                    $('#anchor').show()
+                    $('#result').show()
+                    $('#nearby').show()
+                    $('#around').show()
+                    $('#show-data').text(JSON.stringify(data,null,' '));
+
+                    $.getJSON(nearby, function(nearbyData) {
+                        console.log(nearbyData)
+                        $('#nearby-data').text(JSON.stringify(nearbyData,null,' '));
+                    }); 
+                    $.getJSON(around, {
+                        include: "cafes,restaurants,groceries"
+                    }, function(aroundData) {
+                        console.log(aroundData)
+                        $('#around-data').text(JSON.stringify(aroundData,null,' '));
+                    }); 
+                })
+                .fail(function(data, textStatus, errorThrown) { 
+                    $('#result').show()
+                    $('#anchor').hide()
+                    $('#nearby').hide()
+                    $('#around').hide()
+                    $('#show-data').text(JSON.stringify(data,null,' '));
+                });
+            });
+        });
+
+    </script>
+    <style>
+            #myBtn {
+              display: none;
+              position: fixed;
+              bottom: 20px;
+              right: 30px;
+              z-index: 99;
+              border: none;
+              outline: none;
+              background-color: red;
+              color: white;
+              cursor: pointer;
+              padding: 15px;
+              border-radius: 10px;
+            }
+            
+            #myBtn:hover {
+              background-color: #555;
+            }
+            </style>
+</head>
+<body>
+
+<button onclick="topFunction()" id="myBtn" title="Go to top">Top</button>
+<div class="container-fluid">
+    <h1><span class="badge badge-secondary">Local Logic Prototype </span></h1>
+    <br>
+    <div id="local-logic-widget"></div>
+    <br>
+    <div class="row">
+        <div class="col-lg-6">    
+            <div class="input-group">
+                <span class="input-group-addon" id="basic-addon1">LAT</span>
+                <input type="text" class="form-control" id="lat" placeholder="49.2757" aria-label="Username" aria-describedby="basic-addon1">
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="input-group">
+                <span class="input-group-addon" id="basic-addon1">LONG</span>
+                <input type="text" class="form-control" id="lng" placeholder="-123.1199" aria-label="Username" aria-describedby="basic-addon1">
+            </div>
+        </div>
+    </div>
+    <br>
+    <div class="alert alert-danger" id="error" role="alert" style="display:none">Enter a latitude and a longitude value.</div>
+    <div class="row">
+        <div class="col-lg-2">  
+            <button id="location-scores" type="button" class="btn btn-info">Location Scores API</button>
+        </div>
+        <div class="col-lg-2" id="anchor" style="display: none">  
+           <a href="#nearby">Jump to Nearby</a>
+           <a href="#around">Jump to Around</a>
+        </div>
+    </div><br>
+    <div id="result" class="row" style="display: none">
+    <pre id="show-data"></pre>
+    <div id="nearby">
+        <div class="alert alert-secondary" role="alert">The /nearby endpoint is used to retrieve a small number of points of interest (POIs) that are closest to a location</div>
+        <pre id="nearby-data"></pre>
+    </div>
+    <div id="around">
+        <div class="alert alert-secondary" role="alert">The /around endpoint is used to retrieve points of interest (POIs) that are within a certain distance of a location.</div>
+        <pre id="around-data"></pre>
+    </div>
+    </div>
+</div>
+</body>
+</html>
