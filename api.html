@@ -4,6 +4,8 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
     <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+    <script src="https://getbootstrap.com/assets/js/vendor/popper.min.js"></script>
+    <script src="https://getbootstrap.com/dist/js/bootstrap.min.js"></script>
     <script type="text/javascript">
         // top scrolling
         window.onscroll = function() {scrollFunction()};
@@ -70,10 +72,6 @@
                     nearby = data.data.links.nearby;
                     around = data.data.links.around;
                     console.log(around)
-                    $('#anchor').show()
-                    $('#result').show()
-                    $('#nearby').show()
-                    $('#around').show()
                     $('#show-data').text(JSON.stringify(data,null,' '));
 
                     $.getJSON(nearby, function(nearbyData) {
@@ -88,10 +86,6 @@
                     }); 
                 })
                 .fail(function(data, textStatus, errorThrown) { 
-                    $('#result').show()
-                    $('#anchor').hide()
-                    $('#nearby').hide()
-                    $('#around').hide()
                     $('#show-data').text(JSON.stringify(data,null,' '));
                 });
             });
@@ -131,13 +125,13 @@
         <div class="col-lg-6">    
             <div class="input-group">
                 <span class="input-group-addon" id="basic-addon1">LAT</span>
-                <input type="text" class="form-control" id="lat" placeholder="49.2757" aria-label="Username" aria-describedby="basic-addon1">
+                <input value="49.2757" type="text" class="form-control" id="lat" placeholder="49.2757" aria-label="Username" aria-describedby="basic-addon1">
             </div>
         </div>
         <div class="col-lg-6">
             <div class="input-group">
                 <span class="input-group-addon" id="basic-addon1">LONG</span>
-                <input type="text" class="form-control" id="lng" placeholder="-123.1199" aria-label="Username" aria-describedby="basic-addon1">
+                <input value="-123.119" type="text" class="form-control" id="lng" placeholder="-123.1199" aria-label="Username" aria-describedby="basic-addon1">
             </div>
         </div>
     </div>
@@ -147,21 +141,33 @@
         <div class="col-lg-2">  
             <button id="location-scores" type="button" class="btn btn-info">Location Scores API</button>
         </div>
-        <div class="col-lg-2" id="anchor" style="display: none">  
-           <a href="#nearby">Jump to Nearby</a>
-           <a href="#around">Jump to Around</a>
+    </div><br>
+    <div class="row">  
+        <div class="col-lg-6">  
+            <ul class="nav nav-tabs" id="myTab" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active" id="score-tab" data-toggle="tab" href="#score" role="tab" aria-controls="score" aria-selected="true">Score</a>
+                </li>
+                <li class="nav-item">
+                        <a class="nav-link" id="nearby-tab" data-toggle="tab" href="#nearby" role="tab" aria-controls="nearby" aria-selected="false">Nearby</a>
+                    </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="around-tab" data-toggle="tab" href="#around" role="tab" aria-controls="around" aria-selected="false">Around</a>
+                </li>
+            </ul>
         </div>
     </div><br>
-    <div id="result" class="row" style="display: none">
-    <pre id="show-data"></pre>
-    <div id="nearby">
-        <div class="alert alert-secondary" role="alert">The /nearby endpoint is used to retrieve a small number of points of interest (POIs) that are closest to a location</div>
-        <pre id="nearby-data"></pre>
-    </div>
-    <div id="around">
-        <div class="alert alert-secondary" role="alert">The /around endpoint is used to retrieve points of interest (POIs) that are within a certain distance of a location.</div>
-        <pre id="around-data"></pre>
-    </div>
+    <!-- <div class="tab-content" id="result" style="display: none"> -->
+    <div class="tab-content" id="myTabContent">    
+        <div id="score" class="tab-pane fade show active" role="tabpanel" aria-labelledby="score-tab">
+            <pre id="show-data"></pre>
+        </div>
+        <div id="nearby" class="tab-pane fade" role="tabpanel" aria-labelledby="nearby-tab">
+             <pre id="nearby-data"></pre>
+        </div>
+        <div id="around" class="tab-pane fade" role="tabpanel" aria-labelledby="around-tab">
+            <pre id="around-data"></pre>
+        </div>
     </div>
 </div>
 </body>
